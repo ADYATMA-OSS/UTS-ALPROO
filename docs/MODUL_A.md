@@ -96,3 +96,192 @@ Usaha laundry membutuhkan sistem kasir berbasis terminal/console yang dapat meng
 | `biayaAntar` | `double` | `0.0` | Biaya antar dalam bentuk Rupiah (0 atau 8000) |
 | `totalTagihan` | `double` | `0.0` | Total biaya akhir yang wajib dibayarkan pelanggan |
 | `counterTransaksi` | `int` | `0` | Menghitung nomor urut transaksi yang diproses |
+
+---
+
+## 4. Algoritma Deskriptif
+
+1. **Mulai Program.**
+2. Inisialisasi variabel dan konstanta sistem. Set penghitung transaksi `counterTransaksi = 0`.
+3. Masuk ke struktur perulangan transaksi (`do ... while`):
+   - Tambah nilai `counterTransaksi` dengan 1.
+   - Tampilkan judul transaksi.
+   - Masukkan `namaPelanggan`.
+   - **Input & Validasi Berat Cucian:**
+     - Minta input `beratCucian`.
+     - Jika input bukan angka atau `beratCucian <= 0`, tampilkan pesan kesalahan dan ulangi input berat hingga valid.
+   - **Input & Validasi Jenis Layanan:**
+     - Tampilkan pilihan menu: 1. Reguler, 2. Express.
+     - Minta input `jenisLayanan`.
+     - Jika `jenisLayanan` bukan 1 dan bukan 2, tampilkan pesan kesalahan dan ulangi hingga valid.
+   - **Input & Validasi Status Member:**
+     - Minta input `statusMember` (Y/T).
+     - Ubah menjadi huruf kapital. Jika bukan 'Y' dan bukan 'T' (atau 'N'), minta input ulang hingga valid.
+   - **Input & Validasi Layanan Antar:**
+     - Minta input `layananAntar` (Y/T).
+     - Ubah menjadi huruf kapital. Jika bukan 'Y' dan bukan 'T' (atau 'N'), minta input ulang hingga valid.
+   - **Proses Perhitungan:**
+     - Bulatkan `beratCucian` ke atas ke bilangan bulat terdekat simpan pada `beratBulat`.
+     - Periksa aturan berat minimum: Jika `beratBulat < 2.0`, maka `beratHitung = 2.0`; jika tidak, `beratHitung = beratBulat`.
+     - Tentukan tarif: Jika `jenisLayanan == 1`, maka `tarifPerKg = 7000`, `namaLayanan = "Reguler"`; jika tidak, `tarifPerKg = 11000`, `namaLayanan = "Express"`.
+     - Hitung subtotal: `subtotalCuci = beratHitung * tarifPerKg`.
+     - Periksa aturan diskon:
+       - Jika `statusMember == 'Y'` DAN `beratHitung >= 5.0`: `persenDiskon = 5%`, `nilaiDiskon = subtotalCuci * 0.05`.
+       - Jika `statusMember == 'T'` DAN `beratHitung >= 10.0`: `persenDiskon = 3%`, `nilaiDiskon = subtotalCuci * 0.03`.
+       - Selain itu: `persenDiskon = 0%`, `nilaiDiskon = 0`.
+     - Periksa biaya antar: Jika `layananAntar == 'Y'`, maka `biayaAntar = 8000`; jika tidak, `biayaAntar = 0`.
+     - Hitung total tagihan: `totalTagihan = (subtotalCuci - nilaiDiskon) + biayaAntar`.
+   - **Tampilkan Rincian Tagihan:**
+     - Cetak nomor transaksi, nama pelanggan, jenis layanan, status member, berat asli, berat hitung, tarif/kg, subtotal cucian, nilai diskon, biaya antar, dan total pembayaran.
+   - **Evaluasi Perulangan:**
+     - Tanyakan kepada kasir apakah ingin memproses transaksi pelanggan lain (Y/T).
+     - Validasi jawaban (Y/T).
+4. Jika kasir memilih 'Y', kembali ke langkah 3.
+5. Jika kasir memilih 'T', tampilkan pesan penutup dan rekapitulasi singkat jumlah transaksi yang berhasil diproses.
+6. **Selesai.**
+
+---
+
+## 5. Pseudocode
+
+```text
+PROGRAM PerhitunganBiayaLaundry_ModulA
+
+KONSTANTA
+    TARIF_REGULER   : real = 7000.0
+    TARIF_EXPRESS   : real = 11000.0
+    BIAYA_ANTAR     : real = 8000.0
+    MIN_BERAT       : real = 2.0
+    MIN_MEMBER      : real = 5.0
+    MIN_NON_MEMBER  : real = 10.0
+    DISKON_MEMBER   : real = 0.05
+    DISKON_NON      : real = 0.03
+
+DEKLARASI VARIABEL
+    namaPelanggan       : string
+    beratCucian         : real
+    jenisLayanan        : integer
+    statusMember        : character
+    layananAntar        : character
+    ulang               : character
+    beratBulat          : real
+    beratHitung         : real
+    tarifPerKg          : real
+    subtotalCuci        : real
+    persenDiskon        : real
+    nilaiDiskon         : real
+    biayaAntar          : real
+    totalTagihan        : real
+    counterTransaksi    : integer
+
+ALGORITMA
+    counterTransaksi <- 0
+
+    DO
+        counterTransaksi <- counterTransaksi + 1
+        
+        OUTPUT "Masukkan Nama Pelanggan: "
+        INPUT namaPelanggan
+
+        // Validasi Berat Cucian
+        REPEAT
+            OUTPUT "Masukkan Berat Cucian (kg): "
+            INPUT beratCucian
+            IF beratCucian <= 0 THEN
+                OUTPUT "Error: Berat cucian harus > 0!"
+            ENDIF
+        UNTIL beratCucian > 0
+
+        // Validasi Jenis Layanan
+        REPEAT
+            OUTPUT "Pilih Jenis Layanan (1. Reguler / 2. Express): "
+            INPUT jenisLayanan
+            IF jenisLayanan != 1 AND jenisLayanan != 2 THEN
+                OUTPUT "Error: Pilihan layanan harus 1 atau 2!"
+            ENDIF
+        UNTIL jenisLayanan == 1 OR jenisLayanan == 2
+
+        // Validasi Status Member
+        REPEAT
+            OUTPUT "Apakah Pelanggan Memiliki Kartu Member? (Y/T): "
+            INPUT statusMember
+            statusMember <- UPPERCASE(statusMember)
+            IF statusMember != 'Y' AND statusMember != 'T' THEN
+                OUTPUT "Error: Masukkan Y atau T!"
+            ENDIF
+        UNTIL statusMember == 'Y' OR statusMember == 'T'
+
+        // Validasi Layanan Antar
+        REPEAT
+            OUTPUT "Gunakan Layanan Antar (+Rp8.000)? (Y/T): "
+            INPUT layananAntar
+            layananAntar <- UPPERCASE(layananAntar)
+            IF layananAntar != 'Y' AND layananAntar != 'T' THEN
+                OUTPUT "Error: Masukkan Y atau T!"
+            ENDIF
+        UNTIL layananAntar == 'Y' OR layananAntar == 'T'
+
+        // Logika Pembulatan dan Aturan Minimum
+        beratBulat <- CEIL(beratCucian)
+        IF beratBulat < MIN_BERAT THEN
+            beratHitung <- MIN_BERAT
+        ELSE
+            beratHitung <- beratBulat
+        ENDIF
+
+        // Penentuan Tarif
+        IF jenisLayanan == 1 THEN
+            tarifPerKg <- TARIF_REGULER
+        ELSE
+            tarifPerKg <- TARIF_EXPRESS
+        ENDIF
+
+        // Perhitungan Subtotal
+        subtotalCuci <- beratHitung * tarifPerKg
+
+        // Penentuan Diskon
+        IF statusMember == 'Y' AND beratHitung >= MIN_MEMBER THEN
+            persenDiskon <- 5.0
+            nilaiDiskon <- subtotalCuci * DISKON_MEMBER
+        ELSE IF statusMember == 'T' AND beratHitung >= MIN_NON_MEMBER THEN
+            persenDiskon <- 3.0
+            nilaiDiskon <- subtotalCuci * DISKON_NON
+        ELSE
+            persenDiskon <- 0.0
+            nilaiDiskon <- 0.0
+        ENDIF
+
+        // Biaya Antar
+        IF layananAntar == 'Y' THEN
+            biayaAntar <- BIAYA_ANTAR
+        ELSE
+            biayaAntar <- 0.0
+        ENDIF
+
+        // Total Tagihan
+        totalTagihan <- (subtotalCuci - nilaiDiskon) + biayaAntar
+
+        // Menampilkan Rincian Tagihan
+        OUTPUT "===== RINCIAN TAGIHAN LAUNDRY ====="
+        OUTPUT "No. Transaksi    : #", counterTransaksi
+        OUTPUT "Nama Pelanggan   : ", namaPelanggan
+        OUTPUT "Berat Aktual     : ", beratCucian, " kg"
+        OUTPUT "Berat Dihitung   : ", beratHitung, " kg"
+        OUTPUT "Tarif per kg     : Rp ", tarifPerKg
+        OUTPUT "Subtotal Biaya   : Rp ", subtotalCuci
+        OUTPUT "Potongan Diskon  : -Rp ", nilaiDiskon
+        OUTPUT "Biaya Antar      : Rp ", biayaAntar
+        OUTPUT "TOTAL TAGIHAN    : Rp ", totalTagihan
+
+        // Validasi Opsi Perulangan
+        REPEAT
+            OUTPUT "Proses pelanggan lain? (Y/T): "
+            INPUT ulang
+            ulang <- UPPERCASE(ulang)
+        UNTIL ulang == 'Y' OR ulang == 'T'
+
+    WHILE ulang == 'Y'
+
+    OUTPUT "Program Selesai. Total transaksi: ", counterTransaksi
+END PROGRAM
+```
