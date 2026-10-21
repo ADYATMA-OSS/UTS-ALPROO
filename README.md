@@ -10,7 +10,7 @@
 ### Anggota Kelompok
 | Peran | Nama Mahasiswa | NIM | Tanggung Jawab Utama |
 | :--- | :--- | :--- | :--- |
-| **Anggota 1** | *(Isi Nama Anggota 1)* | *(Isi NIM)* | **Modul A (Proses Utama)** |
+| **Anggota 1** | *Nur Adyatma Pratama* | *322610016* | **Modul A (Proses Utama)** |
 | **Anggota 2** | *(Isi Nama Anggota 2)* | *(Isi NIM)* | **Modul B (Rekapitulasi)** |
 
 ---
