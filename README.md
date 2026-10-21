@@ -19,30 +19,39 @@
 ```text
 uts-with-ema/
 ├── docs/
-│   └── MODUL_A.md        # Dokumentasi lengkap Modul A (Analisis, IPO, Algoritma, Flowchart, Trace Table)
+│   ├── MODUL_A.md        # Dokumentasi proses utama dan rincian tagihan
+│   └── MODUL_B.md        # Dokumentasi rekapitulasi harian
 ├── src/
-│   ├── modul_a.cpp       # Source code C++ Modul A (Proses Utama & Rincian Tagihan)
-│   └── modul_a           # Binary hasil kompilasi lokal
+│   ├── modul_a.cpp       # Source code C++ Modul A
+│   └── modul_b.cpp       # Program terintegrasi Modul A + Modul B
 └── README.md             # Gambaran umum proyek dan petunjuk eksekusi
 ```
 
 ---
 
-### Cara Mengompilasi dan Menjalankan Modul A
+### Cara Mengompilasi dan Menjalankan
 Pastikan terminal Anda memiliki compiler C++ (`g++` atau `clang++`).
 
-1. **Kompilasi source code:**
+Untuk menjalankan Modul A secara mandiri:
+
    ```bash
    g++ -Wall -Wextra -std=c++11 src/modul_a.cpp -o src/modul_a
    ```
-   *(atau menggunakan `clang++` di macOS)*
+
+Untuk menjalankan program terintegrasi Modul A + Modul B:
+
    ```bash
-   clang++ -Wall -Wextra -std=c++11 src/modul_a.cpp -o src/modul_a
+   g++ -Wall -Wextra -std=c++11 src/modul_b.cpp -o src/modul_b
    ```
 
-2. **Jalankan program:**
+Jalankan program yang diinginkan dari direktori utama proyek:
+
    ```bash
    ./src/modul_a
+   ```
+   atau
+   ```bash
+   ./src/modul_b
    ```
 
 ---
@@ -70,7 +79,6 @@ Pastikan terminal Anda memiliki compiler C++ (`g++` atau `clang++`).
 - [x] Algoritma Deskriptif, Pseudocode, dan Flowchart Modul A
 - [x] Implementasi C++ Modul A dan Penanganan Validasi Input
 - [x] Tabel Pengujian (8 Skenario) dan Trace Table Modul A
-- [ ] Pengerjaan Modul B (Rekapitulasi Harian, Statistik Pendapatan, Transaksi Terbesar)
-- [ ] Integrasi Modul A dan Modul B menjadi Program Utuh
+- [x] Pengerjaan Modul B (Rekapitulasi Harian, Statistik Pendapatan, Transaksi Terbesar)
+- [x] Integrasi Modul A dan Modul B menjadi Program Utuh
 - [ ] Publikasi ke GitHub Pages
-
