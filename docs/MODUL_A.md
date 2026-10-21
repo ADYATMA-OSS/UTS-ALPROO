@@ -351,3 +351,94 @@ flowchart TD
     ValUlang -- "Ya" --> LoopStart
     ValUlang -- "Tidak" --> Finish(["Selesai (Cetak Ringkasan Transaksi)"])
 ```
+
+---
+
+## 7. Tabel Skenario Pengujian (Test Case Table)
+
+Sesuai pedoman proyek, pengujian wajib mencakup kondisi normal, batas bawah, batas atas/kondisi khusus, percabangan diskon, dan input tidak valid.
+
+| No | Skenario Uji | Data Masukan (Input) | Hasil yang Diharapkan (Expected) | Hasil Aktual | Status |
+| :---: | :--- | :--- | :--- | :--- | :---: |
+| 1 | **Batas Bawah Berat (< 2 kg)**<br>Menguji penaikan otomatis ke minimum 2 kg | Nama: Andi<br>Berat: `1.2`<br>Layanan: `1` (Reguler)<br>Member: `T`<br>Antar: `Y` | Berat Hitung: 2 kg<br>Subtotal: Rp14.000<br>Diskon: Rp0 (0%)<br>Antar: Rp8.000<br>**Total: Rp22.000** | Sesuai ekspektasi | **Berhasil** |
+| 2 | **Pembulatan Pecahan ke Atas**<br>Menguji fungsi ceil pada pecahan | Nama: Budi<br>Berat: `3.1`<br>Layanan: `1` (Reguler)<br>Member: `T`<br>Antar: `T` | Berat Hitung: 4 kg<br>Subtotal: Rp28.000<br>Diskon: Rp0 (0%)<br>Antar: Rp0<br>**Total: Rp28.000** | Sesuai ekspektasi | **Berhasil** |
+| 3 | **Batas Bawah Diskon Member (5 kg)**<br>Member tepat 5 kg mendapat diskon 5% | Nama: Cantika<br>Berat: `4.5` (bulat 5 kg)<br>Layanan: `2` (Express)<br>Member: `Y`<br>Antar: `T` | Berat Hitung: 5 kg<br>Subtotal: Rp55.000<br>Diskon 5%: Rp2.750<br>Antar: Rp0<br>**Total: Rp52.250** | Sesuai ekspektasi | **Berhasil** |
+| 4 | **Member di Bawah Ambang Diskon**<br>Member < 5 kg tidak mendapat diskon | Nama: Doni<br>Berat: `3.0`<br>Layanan: `1` (Reguler)<br>Member: `Y`<br>Antar: `Y` | Berat Hitung: 3 kg<br>Subtotal: Rp21.000<br>Diskon: Rp0 (0%)<br>Antar: Rp8.000<br>**Total: Rp29.000** | Sesuai ekspektasi | **Berhasil** |
+| 5 | **Batas Bawah Diskon Non-Member (10 kg)**<br>Non-member tepat 10 kg mendapat diskon 3% | Nama: Eka<br>Berat: `10.0`<br>Layanan: `1` (Reguler)<br>Member: `T`<br>Antar: `T` | Berat Hitung: 10 kg<br>Subtotal: Rp70.000<br>Diskon 3%: Rp2.100<br>Antar: Rp0<br>**Total: Rp67.900** | Sesuai ekspektasi | **Berhasil** |
+| 6 | **Express + Non-Member > 10 kg + Antar**<br>Menguji agar biaya antar tidak didiskon | Nama: Faisal<br>Berat: `11.2` (bulat 12 kg)<br>Layanan: `2` (Express)<br>Member: `T`<br>Antar: `Y` | Berat Hitung: 12 kg<br>Subtotal: Rp132.000<br>Diskon 3%: Rp3.960<br>Antar: Rp8.000<br>**Total: Rp136.040** | Sesuai ekspektasi | **Berhasil** |
+| 7 | **Input Berat Tidak Valid ($\le 0$ & Huruf)**<br>Program menolak nilai negatif dan non-angka | Berat: `-5` kemudian `abc` kemudian `4` | Menampilkan pesan error, meminta input ulang hingga valid | Program menampilkan error dan meminta ulang | **Berhasil** |
+| 8 | **Input Menu / Karakter Tidak Valid**<br>Program menolak pilihan selain yang tersedia | Layanan: `5` $\rightarrow$ `1`<br>Member: `X` $\rightarrow$ `Y`<br>Antar: `9` $\rightarrow$ `T` | Menampilkan pesan error validasi pada tiap input salah | Program menolak dan berhasil memproses saat input benar | **Berhasil** |
+
+---
+
+## 8. Trace Table (Tabel Penelusuran Variabel)
+
+### 8.1 Trace Table Percabangan (Branching Evaluation)
+Menguji penelusuran variabel pada logika penentuan berat, tarif, diskon, dan biaya antar untuk 3 kasus berbeda:
+
+| Langkah / Evaluasi | Kasus 1 (Andi) | Kasus 2 (Cantika) | Kasus 3 (Faisal) |
+| :--- | :--- | :--- | :--- |
+| `namaPelanggan` | "Andi" | "Cantika" | "Faisal" |
+| `beratCucian` | 1.2 | 4.5 | 11.2 |
+| `jenisLayanan` | 1 (Reguler) | 2 (Express) | 2 (Express) |
+| `statusMember` | 'T' | 'Y' | 'T' |
+| `layananAntar` | 'Y' | 'T' | 'Y' |
+| `beratBulat` = `ceil(beratCucian)` | 2.0 | 5.0 | 12.0 |
+| `beratBulat < 2.0` | False (2.0 tidak < 2.0) | False | False |
+| **`beratHitung`** | **2.0** | **5.0** | **12.0** |
+| `tarifPerKg` | 7000 | 11000 | 11000 |
+| **`subtotalCuci`** | **14000** | **55000** | **132000** |
+| Evaluasi Diskon: | | | |
+| - `statusMember == 'Y' && berat >= 5` | False ('T') | **True** ('Y' & 5 >= 5) | False ('T') |
+| - `statusMember == 'T' && berat >= 10` | False (2 < 10) | (Dilewati) | **True** ('T' & 12 >= 10) |
+| `persenDiskon` | 0% | 5% | 3% |
+| **`nilaiDiskon`** | **0** | **2750** | **3960** |
+| `layananAntar == 'Y'` | True | False | True |
+| **`biayaAntar`** | **8000** | **0** | **8000** |
+| **`totalTagihan`** | **22000** | **52250** | **136040** |
+
+---
+
+### 8.2 Trace Table Perulangan (Loop Execution)
+Menguji perubahan variabel akumulasi kontrol perulangan `do ... while` selama 2 iterasi:
+
+| Iterasi ke- | `counterTransaksi` (Awal) | Data Input Pelanggan | `totalTagihan` Terhitung | Input `ulang` | Kondisi `ulang == 'Y'` | Tindakan Selanjutnya |
+| :---: | :---: | :--- | :---: | :---: | :---: | :--- |
+| **1** | 0 $\rightarrow$ 1 | Andi, 1.2 kg, Reguler | Rp22.000 | 'Y' | **True** | Lanjut iterasi ke-2 |
+| **2** | 1 $\rightarrow$ 2 | Cantika, 4.5 kg, Express | Rp52.250 | 'T' | **False** | Keluar dari perulangan, cetak pesan akhir |
+
+---
+
+## 9. Panduan Presentasi & Antisipasi "Parameter Kejutan"
+
+Pada saat ujian/verifikasi individual, dosen penguji akan menguji pemahaman mendalam mahasiswa dengan memberikan parameter kejutan (*live code modification*). Berikut adalah beberapa skenario yang sangat sering muncul beserta cara mengatasinya:
+
+### Kejutan 1: "Ubah batas diskon member dari 5 kg menjadi 7 kg"
+- **Bagian yang diubah:** Konstanta `MIN_BERAT_MEMBER_DISKON = 7.0;` pada baris 21.
+- **Dampak Algoritma:** Kondisi percabangan `beratHitung >= MIN_BERAT_MEMBER_DISKON` otomatis mengikuti nilai baru tanpa perlu mengubah rumus subtotal atau diskon lainnya.
+
+### Kejutan 2: "Ubah tarif layanan antar menjadi Rp10.000 dan kena diskon jika member"
+- **Bagian yang diubah:**
+  1. Ubah konstanta `BIAYA_ANTAR = 10000.0;`.
+  2. Ubah urutan perhitungan:
+     ```cpp
+     double totalSebelumDiskon = subtotalCuci + biayaAntar;
+     nilaiDiskon = totalSebelumDiskon * (persenDiskon / 100.0);
+     totalTagihan = totalSebelumDiskon - nilaiDiskon;
+     ```
+
+### Kejutan 3: "Tambahkan jenis layanan baru: Kilat 3 Jam (Rp15.000/kg)"
+- **Bagian yang diubah:**
+  1. Tambah konstanta `const double TARIF_KILAT = 15000.0;`.
+  2. Perbarui validasi menu pilihan menjadi `(1, 2, atau 3)`.
+  3. Perbarui percabangan `if-else`:
+     ```cpp
+     if (jenisLayanan == 1) {
+         tarifPerKg = TARIF_REGULER;
+     } else if (jenisLayanan == 2) {
+         tarifPerKg = TARIF_EXPRESS;
+     } else {
+         tarifPerKg = TARIF_KILAT;
+     }
+     ```
+

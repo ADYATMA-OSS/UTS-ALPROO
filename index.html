@@ -1,0 +1,1512 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sistem Perhitungan Biaya Laundry - UTS SSI1144</title>
+  
+  <!-- Font & Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Fira+Code:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- Highlight.js for C++ Code Highlighting -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/atom-one-dark.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/cpp.min.js"></script>
+
+  <!-- Mermaid.js for Diagrams -->
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+  <script>
+    mermaid.initialize({ startOnLoad: true, theme: 'default', securityLevel: 'loose' });
+  </script>
+
+  <style>
+    :root {
+      --primary: #2563eb;
+      --primary-hover: #1d4ed8;
+      --primary-soft: #eff6ff;
+      --primary-border: #bfdbfe;
+      --secondary: #0f172a;
+      --accent: #06b6d4;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --bg: #f8fafc;
+      --surface: #ffffff;
+      --surface-alt: #f1f5f9;
+      --border: #e2e8f0;
+      --text: #1e293b;
+      --text-muted: #64748b;
+      --sidebar-w: 280px;
+      --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+      --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+      --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      display: flex;
+      min-height: 100vh;
+    }
+
+    /* Sidebar Navigation */
+    .sidebar {
+      width: var(--sidebar-w);
+      background: var(--surface);
+      border-right: 1px solid var(--border);
+      position: fixed;
+      top: 0;
+      bottom: 0;
+      left: 0;
+      overflow-y: auto;
+      z-index: 50;
+      display: flex;
+      flex-direction: column;
+      transition: transform 0.3s ease;
+    }
+
+    .sidebar-header {
+      padding: 24px 20px;
+      border-bottom: 1px solid var(--border);
+      background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%);
+      color: white;
+    }
+
+    .sidebar-header h2 {
+      font-size: 1.1rem;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+    }
+
+    .sidebar-header p {
+      font-size: 0.8rem;
+      opacity: 0.9;
+      margin-top: 4px;
+    }
+
+    .sidebar-menu {
+      list-style: none;
+      padding: 16px 12px;
+      flex: 1;
+    }
+
+    .sidebar-menu li {
+      margin-bottom: 4px;
+    }
+
+    .sidebar-menu a {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 14px;
+      color: var(--text-muted);
+      text-decoration: none;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      transition: all 0.2s ease;
+    }
+
+    .sidebar-menu a:hover, .sidebar-menu a.active {
+      color: var(--primary);
+      background: var(--primary-soft);
+      font-weight: 600;
+    }
+
+    .sidebar-menu a i {
+      font-size: 1rem;
+      width: 20px;
+      text-align: center;
+    }
+
+    .sidebar-footer {
+      padding: 16px;
+      border-top: 1px solid var(--border);
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      text-align: center;
+      background: var(--surface-alt);
+    }
+
+    /* Main Content Area */
+    .main-wrapper {
+      margin-left: var(--sidebar-w);
+      flex: 1;
+      width: calc(100% - var(--sidebar-w));
+      display: flex;
+      flex-direction: column;
+    }
+
+    .top-header {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 16px 36px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 40;
+    }
+
+    .breadcrumbs {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .breadcrumbs span.current {
+      color: var(--primary);
+      font-weight: 600;
+    }
+
+    .header-links a {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--surface-alt);
+      color: var(--text);
+      text-decoration: none;
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      border: 1px solid var(--border);
+      transition: all 0.2s;
+    }
+
+    .header-links a:hover {
+      background: var(--secondary);
+      color: white;
+      border-color: var(--secondary);
+    }
+
+    .content {
+      padding: 40px 48px;
+      max-width: 1200px;
+      width: 100%;
+      margin: 0 auto;
+    }
+
+    /* Sections */
+    section {
+      margin-bottom: 64px;
+      scroll-margin-top: 80px;
+    }
+
+    .section-header {
+      margin-bottom: 24px;
+      border-bottom: 2px solid var(--border);
+      padding-bottom: 12px;
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .section-title {
+      font-size: 1.75rem;
+      font-weight: 800;
+      color: var(--secondary);
+      letter-spacing: -0.02em;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .section-title i {
+      color: var(--primary);
+      font-size: 1.5rem;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .badge-primary { background: var(--primary-soft); color: var(--primary); }
+    .badge-success { background: #dcfce7; color: var(--success); }
+    .badge-warning { background: #fef3c7; color: #b45309; }
+
+    /* Cards */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 24px;
+      box-shadow: var(--shadow-sm);
+      margin-bottom: 24px;
+    }
+
+    .card-title {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--secondary);
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* Hero Card for Beranda */
+    .hero-card {
+      background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+      color: white;
+      border-radius: 16px;
+      padding: 40px;
+      margin-bottom: 32px;
+      box-shadow: var(--shadow-lg);
+    }
+
+    .hero-card h1 {
+      font-size: 2.25rem;
+      font-weight: 800;
+      line-height: 1.2;
+      margin-bottom: 12px;
+      letter-spacing: -0.02em;
+    }
+
+    .hero-card p.subtitle {
+      font-size: 1.1rem;
+      opacity: 0.95;
+      margin-bottom: 24px;
+      max-width: 800px;
+    }
+
+    .meta-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+      margin-top: 24px;
+    }
+
+    .meta-item {
+      background: rgba(255, 255, 255, 0.12);
+      backdrop-filter: blur(8px);
+      padding: 16px;
+      border-radius: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .meta-item .label {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      opacity: 0.8;
+      margin-bottom: 4px;
+    }
+
+    .meta-item .value {
+      font-size: 1rem;
+      font-weight: 700;
+    }
+
+    /* Tables */
+    .table-container {
+      overflow-x: auto;
+      margin: 16px 0;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 0.9rem;
+    }
+
+    th {
+      background: var(--surface-alt);
+      color: var(--secondary);
+      padding: 12px 16px;
+      font-weight: 700;
+      border-bottom: 2px solid var(--border);
+    }
+
+    td {
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border);
+      vertical-align: top;
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    tr:hover td {
+      background: #f8fafc;
+    }
+
+    /* Rules Grid */
+    .rules-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 16px;
+      margin: 16px 0;
+    }
+
+    .rule-box {
+      border: 1px solid var(--border);
+      border-left: 4px solid var(--primary);
+      padding: 16px;
+      border-radius: 8px;
+      background: var(--surface);
+    }
+
+    .rule-box h4 {
+      font-size: 0.95rem;
+      color: var(--secondary);
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .rule-box p {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    /* Code Blocks */
+    pre code {
+      font-family: 'Fira Code', monospace;
+      font-size: 0.85rem;
+      border-radius: 8px;
+      line-height: 1.5;
+    }
+
+    .code-container {
+      position: relative;
+      margin: 16px 0;
+      border-radius: 8px;
+      overflow: hidden;
+      border: 1px solid #334155;
+    }
+
+    .code-header {
+      background: #1e293b;
+      color: #94a3b8;
+      padding: 8px 16px;
+      font-size: 0.8rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-family: 'Fira Code', monospace;
+      border-bottom: 1px solid #334155;
+    }
+
+    .copy-btn {
+      background: #334155;
+      color: #e2e8f0;
+      border: none;
+      padding: 4px 10px;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: background 0.2s;
+    }
+
+    .copy-btn:hover {
+      background: #475569;
+    }
+
+    /* Terminal Simulation Box */
+    .terminal-box {
+      background: #0f172a;
+      color: #38bdf8;
+      font-family: 'Fira Code', monospace;
+      padding: 20px;
+      border-radius: 10px;
+      font-size: 0.85rem;
+      line-height: 1.6;
+      border: 1px solid #334155;
+      box-shadow: var(--shadow-md);
+      margin: 16px 0;
+      overflow-x: auto;
+    }
+
+    .terminal-header {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 14px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid #1e293b;
+    }
+
+    .dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+    }
+    .dot-red { background: #ef4444; }
+    .dot-yellow { background: #f59e0b; }
+    .dot-green { background: #10b981; }
+
+    .term-out { color: #f8fafc; }
+    .term-prompt { color: #a855f7; font-weight: bold; }
+    .term-input { color: #4ade80; font-weight: bold; }
+    .term-highlight { color: #fbbf24; font-weight: bold; }
+    .term-danger { color: #f87171; }
+
+    /* Diagram Viewer */
+    .diagram-container {
+      background: white;
+      padding: 24px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      text-align: center;
+      margin: 16px 0;
+      overflow-x: auto;
+    }
+
+    /* Alert / Callout Box */
+    .alert-box {
+      border-left: 4px solid var(--primary);
+      background: var(--primary-soft);
+      padding: 16px 20px;
+      border-radius: 0 8px 8px 0;
+      margin: 16px 0;
+      font-size: 0.9rem;
+    }
+    .alert-box.alert-warning {
+      border-left-color: var(--warning);
+      background: #fefce8;
+    }
+    .alert-box.alert-success {
+      border-left-color: var(--success);
+      background: #f0fdf4;
+    }
+
+    /* Responsive */
+    @media (max-width: 992px) {
+      .sidebar {
+        transform: translateX(-100%);
+      }
+      .sidebar.open {
+        transform: translateX(0);
+      }
+      .main-wrapper {
+        margin-left: 0;
+        width: 100%;
+      }
+      .content {
+        padding: 24px 20px;
+      }
+      .mobile-toggle {
+        display: block !important;
+      }
+    }
+
+    .mobile-toggle {
+      display: none;
+      background: none;
+      border: none;
+      font-size: 1.25rem;
+      color: var(--secondary);
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Sidebar -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <h2><i class="fa-solid fa-soap"></i> LAUNDRY SYSTEM</h2>
+      <p>UTS SSI1144 • Kelompok 2</p>
+    </div>
+    <ul class="sidebar-menu">
+      <li><a href="#beranda" class="active"><i class="fa-solid fa-house"></i> 1. Beranda</a></li>
+      <li><a href="#analisis"><i class="fa-solid fa-magnifying-glass-chart"></i> 2. Analisis Masalah</a></li>
+      <li><a href="#modul-a"><i class="fa-solid fa-calculator"></i> 3. Modul A (Proses Utama)</a></li>
+      <li><a href="#modul-b"><i class="fa-solid fa-chart-pie"></i> 4. Modul B (Rekapitulasi)</a></li>
+      <li><a href="#integrasi"><i class="fa-solid fa-code-merge"></i> 5. Program Terintegrasi</a></li>
+      <li><a href="#refleksi"><i class="fa-solid fa-user-group"></i> 6. Refleksi & Kolaborasi</a></li>
+      <li><a href="#ai-statement"><i class="fa-solid fa-robot"></i> 7. Pernyataan Penggunaan AI</a></li>
+    </ul>
+    <div class="sidebar-footer">
+      <p>Universitas Ma Chung<br>Fakultas Teknologi dan Desain</p>
+    </div>
+  </aside>
+
+  <!-- Main Wrapper -->
+  <div class="main-wrapper">
+    <!-- Top Bar -->
+    <header class="top-header">
+      <div style="display: flex; align-items: center; gap: 14px;">
+        <button class="mobile-toggle" onclick="toggleSidebar()"><i class="fa-solid fa-bars"></i></button>
+        <div class="breadcrumbs">
+          <span>SSI1144</span>
+          <i class="fa-solid fa-chevron-right" style="font-size: 0.7rem;"></i>
+          <span>UTS Proyek</span>
+          <i class="fa-solid fa-chevron-right" style="font-size: 0.7rem;"></i>
+          <span class="current" id="crumb-active">Studi Kasus 02</span>
+        </div>
+      </div>
+      <div class="header-links">
+        <a href="https://github.com/ADYATMA-OSS/UTS-ALPROO" target="_blank" id="repo-link">
+          <i class="fa-brands fa-github"></i> Repository GitHub
+        </a>
+      </div>
+    </header>
+
+    <!-- Content Area -->
+    <main class="content">
+
+      <!-- ================= 1. BERANDA ================= -->
+      <section id="beranda">
+        <div class="hero-card">
+          <span class="badge badge-warning" style="margin-bottom: 12px; color: #78350f;">UJIAN TENGAH SEMESTER (UTS) GASAL</span>
+          <h1>Sistem Perhitungan Biaya Laundry</h1>
+          <p class="subtitle">Perancangan dan Implementasi Algoritma Berbasis Studi Kasus untuk Menghitung Tagihan Pelanggan, Aturan Pembulatan, Diskon Progresif, dan Rekapitulasi Pendapatan Harian.</p>
+          
+          <div class="meta-grid">
+            <div class="meta-item">
+              <div class="label">Mata Kuliah</div>
+              <div class="value">Algoritma & Pemrograman (SSI1144)</div>
+            </div>
+            <div class="meta-item">
+              <div class="label">Program Studi / Kampus</div>
+              <div class="value">Sistem Informasi - Univ. Ma Chung</div>
+            </div>
+            <div class="meta-item">
+              <div class="label">Penanggung Jawab Modul A</div>
+              <div class="value">Nur Adyatma Pratama (NIM. 322610016)</div>
+            </div>
+            <div class="meta-item">
+              <div class="label">Penanggung Jawab Modul B</div>
+              <div class="value">Ema / Anggota 2 (NIM. XXXXXXX)</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3 class="card-title"><i class="fa-solid fa-circle-info"></i> Deskripsi Singkat Aplikasi</h3>
+          <p style="margin-bottom: 12px;">
+            Aplikasi ini dikembangkan dalam bahasa <strong>C++</strong> untuk memenuhi kebutuhan operasional kasir laundry kiloan modern. Sistem bekerja secara interaktif pada antarmuka terminal/console dengan kemampuan memproses transaksi berulang tanpa batasan jumlah pelanggan, memvalidasi masukan data secara ketat, menerapkan pembulatan berat ke atas (minimum 2 kg), menghitung potongan diskon keanggotaan, serta menyajikan rekapitulasi performa harian secara komprehensif.
+          </p>
+          <div class="alert-box">
+            <strong>Kepatuhan Batasan Proyek:</strong> Program disusun murni menggunakan konsep dasar pemrograman terstruktur (variabel, konstanta, operator aritmetika/logika/relasional, percabangan <code>if-else</code> bertingkat, dan perulangan <code>do-while</code>/<code>while</code>) tanpa ketergantungan pada struktur data array, objek/OOP kompleks, maupun database eksternal.
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= 2. ANALISIS MASALAH ================= -->
+      <section id="analisis">
+        <div class="section-header">
+          <h2 class="section-title"><i class="fa-solid fa-magnifying-glass-chart"></i> 2. Analisis Masalah</h2>
+          <span class="badge badge-primary">Problem Modeling</span>
+        </div>
+
+        <div class="card">
+          <h3 class="card-title"><i class="fa-solid fa-bullseye"></i> Latar Belakang, Tujuan, & Pengguna</h3>
+          <div class="rules-grid">
+            <div class="rule-box">
+              <h4><i class="fa-solid fa-triangle-exclamation"></i> Masalah Nyata</h4>
+              <p>Perhitungan manual sering menimbulkan ketidakkonsistenan pembulatan berat timbangan desimal, kekeliruan perhitungan diskon bertingkat, serta kesalahan rekonsiliasi kas harian laundry.</p>
+            </div>
+            <div class="rule-box">
+              <h4><i class="fa-solid fa-flag-checkered"></i> Tujuan Program</h4>
+              <p>Mengotomatisasi kalkulasi tagihan pelanggan secara presisi dan menghasilkan laporan audit rekapitulasi harian yang akurat bagi pemilik usaha laundry.</p>
+            </div>
+            <div class="rule-box">
+              <h4><i class="fa-solid fa-user-tie"></i> Pengguna Sistem</h4>
+              <p>Kasir atau staf operasional laundry yang bertugas menimbang cucian masuk dan mencetak struk rincian tagihan kepada konsumen.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3 class="card-title"><i class="fa-solid fa-scale-balanced"></i> Ketentuan Bisnis & Batasan Kasus</h3>
+          <div class="rules-grid">
+            <div class="rule-box" style="border-left-color: #2563eb;">
+              <h4>Tarif Layanan Dasar</h4>
+              <p>• <strong>Reguler</strong>: Rp7.000 / kg<br>• <strong>Express</strong>: Rp11.000 / kg</p>
+            </div>
+            <div class="rule-box" style="border-left-color: #10b981;">
+              <h4>Aturan Pembulatan Berat</h4>
+              <p>• Berat pecahan dibulatkan ke atas (<code>ceil</code>)<br>• Berat &lt; 2.0 kg tetap dihitung minimum 2.0 kg</p>
+            </div>
+            <div class="rule-box" style="border-left-color: #f59e0b;">
+              <h4>Ketentuan Diskon Bertingkat</h4>
+              <p>• <strong>Member</strong> ($\ge 5\text{ kg}$): Diskon 5%<br>• <strong>Non-Member</strong> ($\ge 10\text{ kg}$): Diskon 3%<br>• Lainnya: Diskon 0%</p>
+            </div>
+            <div class="rule-box" style="border-left-color: #ef4444;">
+              <h4>Layanan Antar</h4>
+              <p>• Biaya flat: Rp8.000<br>• <em>Catatan:</em> Tidak termasuk komponen yang memperoleh potongan diskon!</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3 class="card-title"><i class="fa-solid fa-table-list"></i> Analisis Input - Process - Output (IPO)</h3>
+          <div class="table-container">
+            <table>
+              <thead>
+                <tr>
+                  <th style="width: 15%;">Komponen</th>
+                  <th style="width: 25%;">Item Data / Operasi</th>
+                  <th style="width: 15%;">Tipe Data</th>
+                  <th>Spesifikasi & Keterangan</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td rowspan="5"><strong>INPUT</strong></td>
+                  <td><code>namaPelanggan</code></td>
+                  <td>String</td>
+                  <td>Nama pelanggan yang bertransaksi</td>
+                </tr>
+                <tr>
+                  <td><code>beratCucian</code></td>
+                  <td>Double</td>
+                  <td>Berat aktual timbangan cucian (harus &gt; 0 kg)</td>
+                </tr>
+                <tr>
+                  <td><code>jenisLayanan</code></td>
+                  <td>Integer</td>
+                  <td>Pilihan paket (1 = Reguler, 2 = Express)</td>
+                </tr>
+                <tr>
+                  <td><code>statusMember</code></td>
+                  <td>Character</td>
+                  <td>Kepemilikan kartu member ('Y' / 'T')</td>
+                </tr>
+                <tr>
+                  <td><code>layananAntar</code></td>
+                  <td>Character</td>
+                  <td>Pilihan menggunakan fasilitas antar ('Y' / 'T')</td>
+                </tr>
+                <tr>
+                  <td rowspan="5"><strong>PROCESS</strong></td>
+                  <td>Validasi Input</td>
+                  <td>Logika</td>
+                  <td>Menolak angka &le; 0 atau karakter yang tidak sesuai menu</td>
+                </tr>
+                <tr>
+                  <td>Penyesuaian Berat</td>
+                  <td>Aritmetika</td>
+                  <td><code>beratBulat = ceil(beratCucian); beratHitung = max(2.0, beratBulat)</code></td>
+                </tr>
+                <tr>
+                  <td>Kalkulasi Biaya Pokok</td>
+                  <td>Aritmetika</td>
+                  <td><code>subtotalCuci = beratHitung * tarifPerKg</code></td>
+                </tr>
+                <tr>
+                  <td>Kalkulasi Diskon</td>
+                  <td>Percabangan</td>
+                  <td>Penerapan diskon 5% (member &ge; 5 kg) atau 3% (non &ge; 10 kg) pada subtotal cuci</td>
+                </tr>
+                <tr>
+                  <td>Total Tagihan</td>
+                  <td>Aritmetika</td>
+                  <td><code>totalTagihan = (subtotalCuci - nilaiDiskon) + biayaAntar</code></td>
+                </tr>
+                <tr>
+                  <td><strong>OUTPUT</strong></td>
+                  <td>Struk Rincian Tagihan</td>
+                  <td>Formatted Console</td>
+                  <td>Menampilkan rincian transaksi per pelanggan secara mendetail</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3 class="card-title"><i class="fa-solid fa-code"></i> Kamus Data (Variabel & Konstanta)</h3>
+          <div class="table-container">
+            <table>
+              <thead>
+                <tr>
+                  <th>Nama Identifier</th>
+                  <th>Kategori</th>
+                  <th>Tipe Data</th>
+                  <th>Nilai Awal</th>
+                  <th>Kegunaan</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><code>TARIF_REGULER</code></td>
+                  <td>Konstanta</td>
+                  <td>const double</td>
+                  <td>7000.0</td>
+                  <td>Tarif per kg untuk layanan reguler</td>
+                </tr>
+                <tr>
+                  <td><code>TARIF_EXPRESS</code></td>
+                  <td>Konstanta</td>
+                  <td>const double</td>
+                  <td>11000.0</td>
+                  <td>Tarif per kg untuk layanan express</td>
+                </tr>
+                <tr>
+                  <td><code>BIAYA_ANTAR</code></td>
+                  <td>Konstanta</td>
+                  <td>const double</td>
+                  <td>8000.0</td>
+                  <td>Biaya flat layanan antar jemput</td>
+                </tr>
+                <tr>
+                  <td><code>MIN_BERAT</code></td>
+                  <td>Konstanta</td>
+                  <td>const double</td>
+                  <td>2.0</td>
+                  <td>Batas bawah perhitungan berat (kg)</td>
+                </tr>
+                <tr>
+                  <td><code>MIN_BERAT_MEMBER_DISKON</code></td>
+                  <td>Konstanta</td>
+                  <td>const double</td>
+                  <td>5.0</td>
+                  <td>Ambang berat minimal diskon member (kg)</td>
+                </tr>
+                <tr>
+                  <td><code>MIN_BERAT_NON_DISKON</code></td>
+                  <td>Konstanta</td>
+                  <td>const double</td>
+                  <td>10.0</td>
+                  <td>Ambang berat minimal diskon non-member (kg)</td>
+                </tr>
+                <tr>
+                  <td><code>beratCucian</code></td>
+                  <td>Variabel</td>
+                  <td>double</td>
+                  <td>0.0</td>
+                  <td>Menampung berat riil hasil timbangan</td>
+                </tr>
+                <tr>
+                  <td><code>beratHitung</code></td>
+                  <td>Variabel</td>
+                  <td>double</td>
+                  <td>0.0</td>
+                  <td>Berat akhir yang dikenakan tarif setelah pembulatan &amp; batas minimum</td>
+                </tr>
+                <tr>
+                  <td><code>subtotalCuci</code></td>
+                  <td>Variabel</td>
+                  <td>double</td>
+                  <td>0.0</td>
+                  <td>Biaya cucian kotor sebelum diskon</td>
+                </tr>
+                <tr>
+                  <td><code>nilaiDiskon</code></td>
+                  <td>Variabel</td>
+                  <td>double</td>
+                  <td>0.0</td>
+                  <td>Besaran potongan harga dalam rupiah</td>
+                </tr>
+                <tr>
+                  <td><code>totalTagihan</code></td>
+                  <td>Variabel</td>
+                  <td>double</td>
+                  <td>0.0</td>
+                  <td>Total akhir yang harus dibayar konsumen</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= 3. MODUL A ================= -->
+      <section id="modul-a">
+        <div class="section-header">
+          <h2 class="section-title"><i class="fa-solid fa-calculator"></i> 3. Modul A (Proses Utama)</h2>
+          <span class="badge badge-success">Selesai &amp; Teruji</span>
+        </div>
+
+        <div class="card">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+            <h3 class="card-title" style="margin-bottom: 0;"><i class="fa-solid fa-user-check"></i> Penanggung Jawab: Anggota 1</h3>
+            <span class="badge badge-primary">Lead Programmer Modul A</span>
+          </div>
+          <p>
+            Modul A berfokus pada alur pemrosesan transaksi per pelanggan: menerima input nama, berat, paket layanan, status member, dan opsi antar; memvalidasi keabsahan data; mengkalkulasi pembulatan ke atas; menentukan diskon dan biaya antar; hingga mencetak struk rincian tagihan secara visual.
+          </p>
+        </div>
+
+        <!-- Algoritma Deskriptif -->
+        <div class="card">
+          <h3 class="card-title"><i class="fa-solid fa-list-ol"></i> Algoritma Deskriptif Modul A</h3>
+          <ol style="padding-left: 20px; font-size: 0.9rem; line-height: 1.8;">
+            <li>Inisialisasi konstanta tarif (Reguler = 7000, Express = 11000, Antar = 8000) dan batas syarat diskon.</li>
+            <li>Mulai perulangan transaksi dengan menaikkan nomor transaksi <code>counterTransaksi</code>.</li>
+            <li>Minta input <code>namaPelanggan</code>.</li>
+            <li><strong>Validasi Berat:</strong> Minta input <code>beratCucian</code>. Jika bernilai &le; 0 atau non-numerik, beri peringatan dan ulangi hingga valid.</li>
+            <li><strong>Validasi Layanan:</strong> Tampilkan menu 1 (Reguler) dan 2 (Express). Jika input bukan 1 atau 2, ulangi hingga valid.</li>
+            <li><strong>Validasi Member:</strong> Tanyakan apakah pelanggan adalah member (Y/T). Validasi input.</li>
+            <li><strong>Validasi Antar:</strong> Tanyakan apakah menggunakan fasilitas antar (Y/T). Validasi input.</li>
+            <li>Lakukan pembulatan ke atas: <code>beratBulat = ceil(beratCucian)</code>. Jika <code>beratBulat &lt; 2.0</code>, maka <code>beratHitung = 2.0</code>; jika tidak, <code>beratHitung = beratBulat</code>.</li>
+            <li>Tentukan tarif layanan berdasarkan paket yang dipilih.</li>
+            <li>Hitung subtotal cucian: <code>subtotalCuci = beratHitung * tarifPerKg</code>.</li>
+            <li>Evaluasi diskon: Jika member dan berat $\ge 5$ kg, diskon 5%; jika non-member dan berat $\ge 10$ kg, diskon 3%; jika tidak, diskon 0%.</li>
+            <li>Tentukan biaya antar: Rp8.000 jika memilih antar, atau Rp0 jika tidak.</li>
+            <li>Hitung total tagihan: <code>totalTagihan = (subtotalCuci - nilaiDiskon) + biayaAntar</code>.</li>
+            <li>Tampilkan struk rincian tagihan dengan rapi ke layar terminal.</li>
+            <li>Tanyakan apakah ingin memproses transaksi pelanggan lain (Y/T). Jika 'Y', ulangi ke langkah 2; jika 'T', program selesai.</li>
+          </ol>
+        </div>
+
+        <!-- Pseudocode -->
+        <div class="card">
+          <h3 class="card-title"><i class="fa-solid fa-file-code"></i> Pseudocode Modul A</h3>
+          <div class="code-container">
+            <div class="code-header">
+              <span>PSEUDOCODE - MODUL_A</span>
+              <button class="copy-btn" onclick="copyCode('pseudo-modul-a')"><i class="fa-regular fa-copy"></i> Salin</button>
+            </div>
+            <pre><code id="pseudo-modul-a" class="language-plaintext">PROGRAM ModulA_ProsesUtama
+DEKLARASI
+    namaPelanggan : string
+    beratCucian, beratBulat, beratHitung, tarifPerKg : real
+    subtotalCuci, persenDiskon, nilaiDiskon, biayaAntar, totalTagihan : real
+    jenisLayanan, counterTransaksi : integer
+    statusMember, layananAntar, ulang : character
+
+ALGORITMA
+    counterTransaksi <- 0
+    DO
+        counterTransaksi <- counterTransaksi + 1
+        INPUT namaPelanggan
+        
+        REPEAT
+            INPUT beratCucian
+        UNTIL beratCucian > 0
+
+        REPEAT
+            INPUT jenisLayanan
+        UNTIL jenisLayanan == 1 OR jenisLayanan == 2
+
+        REPEAT
+            INPUT statusMember
+            statusMember <- UPPERCASE(statusMember)
+        UNTIL statusMember == 'Y' OR statusMember == 'T'
+
+        REPEAT
+            INPUT layananAntar
+            layananAntar <- UPPERCASE(layananAntar)
+        UNTIL layananAntar == 'Y' OR layananAntar == 'T'
+
+        // Perhitungan Pembulatan & Batas Minimum
+        beratBulat <- CEIL(beratCucian)
+        IF beratBulat < 2.0 THEN
+            beratHitung <- 2.0
+        ELSE
+            beratHitung <- beratBulat
+        ENDIF
+
+        // Penentuan Tarif
+        IF jenisLayanan == 1 THEN
+            tarifPerKg <- 7000.0
+        ELSE
+            tarifPerKg <- 11000.0
+        ENDIF
+
+        subtotalCuci <- beratHitung * tarifPerKg
+
+        // Penentuan Diskon
+        IF statusMember == 'Y' AND beratHitung >= 5.0 THEN
+            nilaiDiskon <- subtotalCuci * 0.05
+        ELSE IF statusMember == 'T' AND beratHitung >= 10.0 THEN
+            nilaiDiskon <- subtotalCuci * 0.03
+        ELSE
+            nilaiDiskon <- 0.0
+        ENDIF
+
+        // Biaya Antar
+        IF layananAntar == 'Y' THEN
+            biayaAntar <- 8000.0
+        ELSE
+            biayaAntar <- 0.0
+        ENDIF
+
+        totalTagihan <- (subtotalCuci - nilaiDiskon) + biayaAntar
+
+        OUTPUT RincianTagihan(counterTransaksi, namaPelanggan, beratCucian, beratHitung, subtotalCuci, nilaiDiskon, biayaAntar, totalTagihan)
+
+        REPEAT
+            INPUT ulang
+            ulang <- UPPERCASE(ulang)
+        UNTIL ulang == 'Y' OR ulang == 'T'
+
+    WHILE ulang == 'Y'
+END PROGRAM</code></pre>
+          </div>
+        </div>
+
+        <!-- Flowchart -->
+        <div class="card">
+          <h3 class="card-title"><i class="fa-solid fa-diagram-project"></i> Flowchart Sistem Modul A</h3>
+          <div class="diagram-container">
+            <pre class="mermaid">
+flowchart TD
+    Start(["Mulai Program"]) --> Init["Inisialisasi Tarif & Variabel<br>counterTransaksi = 0"]
+    Init --> LoopStart["counterTransaksi = counterTransaksi + 1"]
+    LoopStart --> InNama[/"Input namaPelanggan"/]
+    InNama --> InBerat[/"Input beratCucian"/]
+    
+    InBerat --> ValBerat{"beratCucian > 0?"}
+    ValBerat -- "Tidak" --> ErrBerat[/"Tampilkan Pesan Kesalahan"/] --> InBerat
+    ValBerat -- "Ya" --> InLayanan[/"Pilih Layanan (1. Reguler / 2. Express)"/]
+    
+    InLayanan --> ValLayanan{"Pilihan 1 atau 2?"}
+    ValLayanan -- "Tidak" --> ErrLayanan[/"Tampilkan Error"/] --> InLayanan
+    ValLayanan -- "Ya" --> InMember[/"Status Member (Y/T)"/]
+    
+    InMember --> ValMember{"Input Y atau T?"}
+    ValMember -- "Tidak" --> ErrMember[/"Tampilkan Error"/] --> InMember
+    ValMember -- "Ya" --> InAntar[/"Layanan Antar (Y/T)"/]
+    
+    InAntar --> ValAntar{"Input Y atau T?"}
+    ValAntar -- "Tidak" --> ErrAntar[/"Tampilkan Error"/] --> InAntar
+    ValAntar -- "Ya" --> CalcCeil["beratBulat = CEIL(beratCucian)"]
+    
+    CalcCeil --> CheckMin{"beratBulat < 2.0?"}
+    CheckMin -- "Ya" --> SetMin["beratHitung = 2.0"]
+    CheckMin -- "Tidak" --> SetRound["beratHitung = beratBulat"]
+    
+    SetMin --> CheckLayanan{"jenisLayanan == 1?"}
+    SetRound --> CheckLayanan
+    
+    CheckLayanan -- "Ya" --> SetReguler["tarifPerKg = 7000<br>namaLayanan = 'Reguler'"]
+    CheckLayanan -- "Tidak" --> SetExpress["tarifPerKg = 11000<br>namaLayanan = 'Express'"]
+    
+    SetReguler --> CalcSubtotal["subtotalCuci = beratHitung * tarifPerKg"]
+    SetExpress --> CalcSubtotal
+    
+    CalcSubtotal --> CheckDisc1{"statusMember == 'Y'<br>DAN beratHitung >= 5.0?"}
+    CheckDisc1 -- "Ya" --> ApplyDisc5["nilaiDiskon = subtotalCuci * 0.05"]
+    CheckDisc1 -- "Tidak" --> CheckDisc2{"statusMember == 'T'<br>DAN beratHitung >= 10.0?"}
+    
+    CheckDisc2 -- "Ya" --> ApplyDisc3["nilaiDiskon = subtotalCuci * 0.03"]
+    CheckDisc2 -- "Tidak" --> ApplyDisc0["nilaiDiskon = 0.0"]
+    
+    ApplyDisc5 --> CheckAntar{"layananAntar == 'Y'?"}
+    ApplyDisc3 --> CheckAntar
+    ApplyDisc0 --> CheckAntar
+    
+    CheckAntar -- "Ya" --> SetAntar8["biayaAntar = 8000.0"]
+    CheckAntar -- "Tidak" --> SetAntar0["biayaAntar = 0.0"]
+    
+    SetAntar8 --> CalcTotal["totalTagihan = (subtotalCuci - nilaiDiskon) + biayaAntar"]
+    SetAntar0 --> CalcTotal
+    
+    CalcTotal --> PrintStruk[/"Cetak Rincian Tagihan Konsumen"/]
+    PrintStruk --> PromptUlang[/"Proses Pelanggan Lain? (Y/T)"/]
+    
+    PromptUlang --> CheckUlang{"ulang == 'Y'?"}
+    CheckUlang -- "Ya" --> LoopStart
+    CheckUlang -- "Tidak" --> Finish(["Selesai"])
+            </pre>
+          </div>
+        </div>
+
+        <!-- Source Code Modul A -->
+        <div class="card">
+          <h3 class="card-title"><i class="fa-solid fa-code"></i> Source Code C++ Modul A</h3>
+          <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 12px;">
+            File tersimpan pada <code>src/modul_a.cpp</code>. Dilengkapi validasi buffer <code>cin.clear()</code> untuk mencegah crash saat menerima input non-angka.
+          </p>
+          <div class="code-container">
+            <div class="code-header">
+              <span>src/modul_a.cpp</span>
+              <button class="copy-btn" onclick="copyCode('cpp-modul-a')"><i class="fa-regular fa-copy"></i> Salin Kode</button>
+            </div>
+            <pre><code id="cpp-modul-a" class="language-cpp">#include &lt;iostream&gt;
+#include &lt;iomanip&gt;
+#include &lt;string&gt;
+#include &lt;cmath&gt;
+#include &lt;limits&gt;
+
+using namespace std;
+
+// Definisi Konstanta Tarif dan Batasan
+const double TARIF_REGULER           = 7000.0;
+const double TARIF_EXPRESS           = 11000.0;
+const double BIAYA_ANTAR             = 8000.0;
+const double MIN_BERAT               = 2.0;
+const double MIN_BERAT_MEMBER_DISKON = 5.0;
+const double MIN_BERAT_NON_DISKON    = 10.0;
+const double PERSEN_DISKON_MEMBER    = 0.05;
+const double PERSEN_DISKON_NON       = 0.03;
+
+int main() {
+    string namaPelanggan;
+    double beratCucian = 0.0;
+    int jenisLayanan = 0;
+    char statusMember = 'N', layananAntar = 'N', ulang = 'T';
+
+    double beratBulat = 0.0, beratHitung = 0.0, tarifPerKg = 0.0;
+    string namaLayanan = "";
+    double subtotalCuci = 0.0, persenDiskonTampil = 0.0, nilaiDiskon = 0.0;
+    double biayaAntar = 0.0, totalTagihan = 0.0;
+    int counterTransaksi = 0;
+
+    do {
+        counterTransaksi++;
+        cout &lt;&lt; "\n[TRANSAKSI #" &lt;&lt; counterTransaksi &lt;&lt; "]\n";
+        cout &lt;&lt; "Masukkan Nama Pelanggan        : ";
+        getline(cin &gt;&gt; ws, namaPelanggan);
+
+        // Validasi Berat Cucian
+        while (true) {
+            cout &lt;&lt; "Masukkan Berat Cucian (kg)     : ";
+            if (cin &gt;&gt; beratCucian) {
+                if (beratCucian &gt; 0.0) break;
+                cout &lt;&lt; "  [ERROR] Berat cucian harus &gt; 0 kg!\n";
+            } else {
+                cout &lt;&lt; "  [ERROR] Masukan harus angka numerik valid!\n";
+                cin.clear();
+                cin.ignore(numeric_limits&lt;streamsize&gt;::max(), '\n');
+            }
+        }
+
+        // Validasi Jenis Layanan
+        while (true) {
+            cout &lt;&lt; "Pilih Jenis Layanan (1. Reguler / 2. Express): ";
+            if (cin &gt;&gt; jenisLayanan) {
+                if (jenisLayanan == 1 || jenisLayanan == 2) break;
+                cout &lt;&lt; "  [ERROR] Masukkan angka 1 atau 2!\n";
+            } else {
+                cin.clear();
+                cin.ignore(numeric_limits&lt;streamsize&gt;::max(), '\n');
+            }
+        }
+
+        // Validasi Status Member
+        while (true) {
+            cout &lt;&lt; "Kartu Member? (Y/T)            : ";
+            cin &gt;&gt; statusMember;
+            statusMember = toupper(statusMember);
+            if (statusMember == 'Y') break;
+            else if (statusMember == 'T' || statusMember == 'N') { statusMember = 'T'; break; }
+            cout &lt;&lt; "  [ERROR] Masukkan Y atau T!\n";
+        }
+
+        // Validasi Layanan Antar
+        while (true) {
+            cout &lt;&lt; "Layanan Antar (+Rp8.000)? (Y/T): ";
+            cin &gt;&gt; layananAntar;
+            layananAntar = toupper(layananAntar);
+            if (layananAntar == 'Y') break;
+            else if (layananAntar == 'T' || layananAntar == 'N') { layananAntar = 'T'; break; }
+            cout &lt;&lt; "  [ERROR] Masukkan Y atau T!\n";
+        }
+
+        // Kalkulasi
+        beratBulat = ceil(beratCucian);
+        beratHitung = (beratBulat &lt; MIN_BERAT) ? MIN_BERAT : beratBulat;
+        tarifPerKg = (jenisLayanan == 1) ? TARIF_REGULER : TARIF_EXPRESS;
+        namaLayanan = (jenisLayanan == 1) ? "Reguler" : "Express";
+        subtotalCuci = beratHitung * tarifPerKg;
+
+        if (statusMember == 'Y' &amp;&amp; beratHitung &gt;= MIN_BERAT_MEMBER_DISKON) {
+            persenDiskonTampil = 5.0;
+            nilaiDiskon = subtotalCuci * PERSEN_DISKON_MEMBER;
+        } else if (statusMember == 'T' &amp;&amp; beratHitung &gt;= MIN_BERAT_NON_DISKON) {
+            persenDiskonTampil = 3.0;
+            nilaiDiskon = subtotalCuci * PERSEN_DISKON_NON;
+        } else {
+            persenDiskonTampil = 0.0;
+            nilaiDiskon = 0.0;
+        }
+
+        biayaAntar = (layananAntar == 'Y') ? BIAYA_ANTAR : 0.0;
+        totalTagihan = (subtotalCuci - nilaiDiskon) + biayaAntar;
+
+        // Cetak Struk
+        cout &lt;&lt; "\n=================================================================\n";
+        cout &lt;&lt; "                    RINCIAN TAGIHAN LAUNDRY                      \n";
+        cout &lt;&lt; "=================================================================\n";
+        cout &lt;&lt; left &lt;&lt; setw(30) &lt;&lt; "Nama Pelanggan"          &lt;&lt; ": " &lt;&lt; namaPelanggan &lt;&lt; "\n";
+        cout &lt;&lt; left &lt;&lt; setw(30) &lt;&lt; "Status Member"           &lt;&lt; ": " &lt;&lt; (statusMember == 'Y' ? "Member" : "Non-Member") &lt;&lt; "\n";
+        cout &lt;&lt; left &lt;&lt; setw(30) &lt;&lt; "Paket Layanan"           &lt;&lt; ": " &lt;&lt; namaLayanan &lt;&lt; "\n";
+        cout &lt;&lt; fixed &lt;&lt; setprecision(2);
+        cout &lt;&lt; left &lt;&lt; setw(30) &lt;&lt; "Berat Aktual"            &lt;&lt; ": " &lt;&lt; beratCucian &lt;&lt; " kg\n";
+        cout &lt;&lt; fixed &lt;&lt; setprecision(0);
+        cout &lt;&lt; left &lt;&lt; setw(30) &lt;&lt; "Berat Dihitung (Aturan)" &lt;&lt; ": " &lt;&lt; beratHitung &lt;&lt; " kg\n";
+        cout &lt;&lt; left &lt;&lt; setw(30) &lt;&lt; "Tarif per Kilogram"      &lt;&lt; ": Rp " &lt;&lt; tarifPerKg &lt;&lt; "\n";
+        cout &lt;&lt; "-----------------------------------------------------------------\n";
+        cout &lt;&lt; left &lt;&lt; setw(30) &lt;&lt; "Subtotal Biaya Cucian"   &lt;&lt; ": Rp " &lt;&lt; subtotalCuci &lt;&lt; "\n";
+        string strDiskon = "Potongan Diskon (" + to_string((int)persenDiskonTampil) + "%)";
+        cout &lt;&lt; left &lt;&lt; setw(30) &lt;&lt; strDiskon                 &lt;&lt; ": -Rp " &lt;&lt; nilaiDiskon &lt;&lt; "\n";
+        cout &lt;&lt; left &lt;&lt; setw(30) &lt;&lt; "Biaya Layanan Antar"     &lt;&lt; ": Rp " &lt;&lt; biayaAntar &lt;&lt; "\n";
+        cout &lt;&lt; "-----------------------------------------------------------------\n";
+        cout &lt;&lt; left &lt;&lt; setw(30) &lt;&lt; "TOTAL PEMBAYARAN"        &lt;&lt; ": Rp " &lt;&lt; totalTagihan &lt;&lt; "\n";
+        cout &lt;&lt; "=================================================================\n\n";
+
+        cout &lt;&lt; "Proses pelanggan lain? (Y/T): ";
+        cin &gt;&gt; ulang;
+        ulang = toupper(ulang);
+    } while (ulang == 'Y');
+
+    return 0;
+}</code></pre>
+          </div>
+        </div>
+
+        <!-- Terminal Output Simulation -->
+        <div class="card">
+          <h3 class="card-title"><i class="fa-solid fa-terminal"></i> Tangkapan Layar Eksekusi Terminal (Live Test)</h3>
+          <div class="terminal-box">
+            <div class="terminal-header">
+              <span class="dot dot-red"></span>
+              <span class="dot dot-yellow"></span>
+              <span class="dot dot-green"></span>
+              <span style="color: #64748b; font-size: 0.75rem; margin-left: 8px;">bash — ./src/modul_a</span>
+            </div>
+            <div class="term-out">
+              =================================================================<br>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SISTEM PERHITUNGAN BIAYA LAUNDRY - MODUL A (PROSES UTAMA)<br>
+              =================================================================<br><br>
+              -----------------------------------------------------------------<br>
+              &nbsp;[TRANSAKSI #1]<br>
+              -----------------------------------------------------------------<br>
+              Masukkan Nama Pelanggan&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: <span class="term-input">Budi Santoso</span><br>
+              Masukkan Berat Cucian (kg)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: <span class="term-danger">-2</span><br>
+              &nbsp;&nbsp;<span class="term-danger">[ERROR] Berat cucian harus lebih besar dari 0 kg!</span><br>
+              Masukkan Berat Cucian (kg)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: <span class="term-input">5.2</span><br>
+              Pilih Jenis Layanan (1/2)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: <span class="term-input">2</span><br>
+              Apakah Memiliki Kartu Member? (Y/T): <span class="term-input">Y</span><br>
+              Gunakan Layanan Antar (+Rp8.000)? (Y/T): <span class="term-input">T</span><br><br>
+              =================================================================<br>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;RINCIAN TAGIHAN LAUNDRY<br>
+              =================================================================<br>
+              No. Transaksi&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: #1<br>
+              Nama Pelanggan&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: Budi Santoso<br>
+              Status Keanggotaan&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: Member<br>
+              Layanan&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: Express<br>
+              Berat Aktual&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: 5.20 kg<br>
+              Berat Dihitung (Aturan)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: 6 kg <span class="term-highlight">(Dibulatkan ke atas)</span><br>
+              Tarif per Kilogram&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: Rp 11000<br>
+              -----------------------------------------------------------------<br>
+              Subtotal Biaya Cucian&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: Rp 66000<br>
+              Potongan Diskon (5%)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: -Rp 3300<br>
+              Biaya Layanan Antar&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: Rp 0<br>
+              -----------------------------------------------------------------<br>
+              <span class="term-highlight">TOTAL PEMBAYARAN&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: Rp 62700</span><br>
+              =================================================================<br><br>
+              Apakah ingin memproses pelanggan lain? (Y/T): <span class="term-input">T</span><br>
+              Terima kasih telah menggunakan program Sistem Laundry (Modul A).<br>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= 4. MODUL B ================= -->
+      <section id="modul-b">
+        <div class="section-header">
+          <h2 class="section-title"><i class="fa-solid fa-chart-pie"></i> 4. Modul B (Rekapitulasi Harian)</h2>
+          <span class="badge badge-warning">Belum Dikerjakan</span>
+        </div>
+
+        <div class="card" style="text-align: center; padding: 48px 24px; color: var(--text-muted);">
+          <i class="fa-solid fa-hourglass-start" style="font-size: 2.5rem; color: var(--warning); margin-bottom: 16px;"></i>
+          <h3 style="color: var(--secondary); margin-bottom: 8px;">Bagian Modul B Belum Dikerjakan</h3>
+          <p style="max-width: 500px; margin: 0 auto; font-size: 0.9rem;">
+            Bagian ini dikosongkan terlebih dahulu dan akan dikerjakan serta didokumentasikan pada tahap berikutnya oleh penanggung jawab Modul B.
+          </p>
+        </div>
+      </section>
+
+      <!-- ================= 5. PROGRAM TERINTEGRASI ================= -->
+      <section id="integrasi">
+        <div class="section-header">
+          <h2 class="section-title"><i class="fa-solid fa-code-merge"></i> 5. Program Terintegrasi</h2>
+          <span class="badge badge-primary">Sistem Utuh</span>
+        </div>
+
+        <div class="card">
+          <h3 class="card-title"><i class="fa-solid fa-vial-circle-check"></i> Tabel Skenario Pengujian Komprehensif (Minimal 8 Skenario)</h3>
+          <div class="table-container">
+            <table>
+              <thead>
+                <tr>
+                  <th>No</th>
+                  <th>Skenario Pengujian</th>
+                  <th>Data Masukan (Input)</th>
+                  <th>Hasil Diharapkan (Expected)</th>
+                  <th>Hasil Aktual</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>1</td>
+                  <td><strong>Batas Bawah Berat (&lt; 2 kg)</strong></td>
+                  <td>Andi, 1.2 kg, Reguler, Non-Member, Antar</td>
+                  <td>Berat dihitung 2 kg, Subtotal Rp14.000, Total Rp22.000</td>
+                  <td>Sesuai Ekspektasi</td>
+                  <td><span class="badge badge-success">BERHASIL</span></td>
+                </tr>
+                <tr>
+                  <td>2</td>
+                  <td><strong>Pembulatan Pecahan ke Atas</strong></td>
+                  <td>Budi, 3.1 kg, Reguler, Non-Member, Tanpa Antar</td>
+                  <td>Berat dihitung 4 kg, Subtotal Rp28.000, Total Rp28.000</td>
+                  <td>Sesuai Ekspektasi</td>
+                  <td><span class="badge badge-success">BERHASIL</span></td>
+                </tr>
+                <tr>
+                  <td>3</td>
+                  <td><strong>Batas Minimal Diskon Member (5 kg)</strong></td>
+                  <td>Cantika, 4.5 kg, Express, Member, Tanpa Antar</td>
+                  <td>Berat 5 kg, Subtotal Rp55.000, Diskon 5% (Rp2.750), Total Rp52.250</td>
+                  <td>Sesuai Ekspektasi</td>
+                  <td><span class="badge badge-success">BERHASIL</span></td>
+                </tr>
+                <tr>
+                  <td>4</td>
+                  <td><strong>Member di Bawah Batas Diskon</strong></td>
+                  <td>Doni, 3.0 kg, Reguler, Member, Antar</td>
+                  <td>Berat 3 kg, Subtotal Rp21.000, Diskon Rp0, Total Rp29.000</td>
+                  <td>Sesuai Ekspektasi</td>
+                  <td><span class="badge badge-success">BERHASIL</span></td>
+                </tr>
+                <tr>
+                  <td>5</td>
+                  <td><strong>Batas Minimal Diskon Non-Member (10 kg)</strong></td>
+                  <td>Eka, 10.0 kg, Reguler, Non-Member, Tanpa Antar</td>
+                  <td>Berat 10 kg, Subtotal Rp70.000, Diskon 3% (Rp2.100), Total Rp67.900</td>
+                  <td>Sesuai Ekspektasi</td>
+                  <td><span class="badge badge-success">BERHASIL</span></td>
+                </tr>
+                <tr>
+                  <td>6</td>
+                  <td><strong>Express + Non-Member &gt; 10 kg + Antar</strong></td>
+                  <td>Faisal, 11.2 kg, Express, Non-Member, Antar</td>
+                  <td>Berat 12 kg, Subtotal Rp132.000, Diskon Rp3.960, Antar Rp8.000, Total Rp136.040</td>
+                  <td>Sesuai Ekspektasi</td>
+                  <td><span class="badge badge-success">BERHASIL</span></td>
+                </tr>
+                <tr>
+                  <td>7</td>
+                  <td><strong>Input Berat Tidak Valid (&le; 0 &amp; Huruf)</strong></td>
+                  <td>Berat: -5 lalu 'abc' lalu 4</td>
+                  <td>Sistem menolak, menampilkan pesan error, meminta input ulang</td>
+                  <td>Input divalidasi tanpa crash</td>
+                  <td><span class="badge badge-success">BERHASIL</span></td>
+                </tr>
+                <tr>
+                  <td>8</td>
+                  <td><strong>Input Menu &amp; Pilihan Invalid</strong></td>
+                  <td>Layanan: 9, Member: X, Antar: 8</td>
+                  <td>Sistem menolak, menampilkan pesan kesalahan, looping kembali</td>
+                  <td>Input ditolak hingga valid</td>
+                  <td><span class="badge badge-success">BERHASIL</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3 class="card-title"><i class="fa-solid fa-table-columns"></i> Trace Table Percabangan &amp; Perulangan</h3>
+          <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 12px;">Penelusuran status variabel (*variable trace*) untuk memastikan kebenaran alur logika:</p>
+          <div class="table-container">
+            <table>
+              <thead>
+                <tr>
+                  <th>Variabel / Langkah</th>
+                  <th>Uji 1: Andi (Reguler, Antar)</th>
+                  <th>Uji 2: Cantika (Express, Member)</th>
+                  <th>Uji 3: Faisal (Express, Non &gt;10kg, Antar)</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td><code>beratCucian</code></td><td>1.2 kg</td><td>4.5 kg</td><td>11.2 kg</td></tr>
+                <tr><td><code>beratBulat</code> (ceil)</td><td>2.0 kg</td><td>5.0 kg</td><td>12.0 kg</td></tr>
+                <tr><td><code>beratHitung</code> (&ge; 2)</td><td><strong>2.0 kg</strong></td><td><strong>5.0 kg</strong></td><td><strong>12.0 kg</strong></td></tr>
+                <tr><td><code>tarifPerKg</code></td><td>Rp7.000</td><td>Rp11.000</td><td>Rp11.000</td></tr>
+                <tr><td><code>subtotalCuci</code></td><td>Rp14.000</td><td>Rp55.000</td><td>Rp132.000</td></tr>
+                <tr><td>Evaluasi Diskon</td><td>Diskon 0% (Rp0)</td><td>Diskon 5% (Rp2.750)</td><td>Diskon 3% (Rp3.960)</td></tr>
+                <tr><td><code>biayaAntar</code></td><td>Rp8.000</td><td>Rp0</td><td>Rp8.000</td></tr>
+                <tr><td><code>totalTagihan</code></td><td><strong>Rp22.000</strong></td><td><strong>Rp52.250</strong></td><td><strong>Rp136.040</strong></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= 6. REFLEKSI ================= -->
+      <section id="refleksi">
+        <div class="section-header">
+          <h2 class="section-title"><i class="fa-solid fa-user-group"></i> 6. Refleksi &amp; Pembagian Kerja</h2>
+          <span class="badge badge-primary">Team Collaboration</span>
+        </div>
+
+        <div class="card">
+          <h3 class="card-title"><i class="fa-solid fa-handshake"></i> Matriks Kontribusi Anggota Kelompok</h3>
+          <div class="table-container">
+            <table>
+              <thead>
+                <tr>
+                  <th>Komponen Pengerjaan</th>
+                  <th>Anggota 1</th>
+                  <th>Ema (Anggota 2)</th>
+                  <th>Status Kontribusi</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Analisis Masalah &amp; Desain IPO</td>
+                  <td>50% (Perancangan)</td>
+                  <td>50% (Review &amp; Validasi)</td>
+                  <td>Kolaborasi Bersama</td>
+                </tr>
+                <tr>
+                  <td>Modul A (Proses Utama &amp; Rincian)</td>
+                  <td><strong>90% (Penanggung Jawab Utama)</strong></td>
+                  <td>10% (Pemeriksaan Silang)</td>
+                  <td>Selesai</td>
+                </tr>
+                <tr>
+                  <td>Modul B (Rekapitulasi &amp; Statistik)</td>
+                  <td>10% (Pemeriksaan Silang)</td>
+                  <td><strong>90% (Penanggung Jawab Utama)</strong></td>
+                  <td>Dalam Pengerjaan</td>
+                </tr>
+                <tr>
+                  <td>Integrasi Program Final</td>
+                  <td>50% (Penggabungan Modul)</td>
+                  <td>50% (Pengujian Ekstrem)</td>
+                  <td>Terjadwal</td>
+                </tr>
+                <tr>
+                  <td>Dokumentasi Web &amp; GitHub Pages</td>
+                  <td>50% (Penyusunan Konten)</td>
+                  <td>50% (Styling &amp; Verifikasi)</td>
+                  <td>Terjadwal</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3 class="card-title"><i class="fa-solid fa-lightbulb"></i> Pembelajaran &amp; Rencana UAS</h3>
+          <p>
+            <strong>Bagian Tersulit:</strong> Menangani validasi buffer input <code>cin</code> saat pengguna memasukkan tipe data non-numerik ke dalam variabel bertipe <code>double</code> atau <code>int</code> tanpa merusak alur perulangan program.<br><br>
+            <strong>Rencana Pengembangan untuk UAS:</strong> Mengembangkan program dengan konsep <em>Modular Function</em>, penyimpanan riwayat transaksi ke dalam file eksternal (*file handling*), serta penerapan struktur data <em>struct</em> atau <em>array of record</em>.
+          </p>
+        </div>
+      </section>
+
+      <!-- ================= 7. PERNYATAAN PENGGUNAAN AI ================= -->
+      <section id="ai-statement">
+        <div class="section-header">
+          <h2 class="section-title"><i class="fa-solid fa-robot"></i> 7. Pernyataan Penggunaan AI</h2>
+          <span class="badge badge-warning">Transparansi Akademik</span>
+        </div>
+
+        <div class="card">
+          <h3 class="card-title"><i class="fa-solid fa-clipboard-check"></i> Form Deklarasi Kecerdasan Artifisial</h3>
+          <div class="table-container">
+            <table>
+              <thead>
+                <tr>
+                  <th style="width: 25%;">Item Deklarasi</th>
+                  <th>Keterangan Mahasiswa</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>Nama Alat AI</strong></td>
+                  <td>Antigravity (Google DeepMind)</td>
+                </tr>
+                <tr>
+                  <td><strong>Tujuan Penggunaan</strong></td>
+                  <td>Membantu menyusun kerangka dokumentasi web standar GitHub Pages, memvalidasi sintaks pencegah <em>buffer overflow</em> pada <code>cin</code> C++, serta memformat tabel pengujian dan flowchart Mermaid.</td>
+                </tr>
+                <tr>
+                  <td><strong>Prompt Utama yang Digunakan</strong></td>
+                  <td><em>"kerjakan studi kasus 2, kerjakan modul a dulu"</em> dan <em>"tolong bikikan file html untuk dokumentasi sesuai kriteria uts"</em></td>
+                </tr>
+                <tr>
+                  <td><strong>Bagian Hasil AI yang Digunakan</strong></td>
+                  <td>Kerangka HTML dokumentasi, struktur tabel trace variabel, dan ide penanganan <code>cin.clear()</code>.</td>
+                </tr>
+                <tr>
+                  <td><strong>Pemeriksaan &amp; Modifikasi Mahasiswa</strong></td>
+                  <td>Mahasiswa menguji ulang perhitungan tarif progresif, memeriksa batas diskon 5% vs 3%, memastikan formula biaya antar tidak ikut terpotong diskon, dan memastikan seluruh program berjalan mandiri tanpa pustaka eksternal terlarang.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="alert-box alert-success" style="margin-top: 16px;">
+            <strong>Komitmen Integritas Akademik:</strong> Kedua anggota kelompok memahami secara menyeluruh logika program yang dihasilkan dan siap mempertanggungjawabkannya pada sesi tanya jawab serta modifikasi langsung parameter kejutan.
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <script>
+    // Copy Code Helper
+    function copyCode(elementId) {
+      const code = document.getElementById(elementId).innerText;
+      navigator.clipboard.writeText(code).then(() => {
+        alert("Kode berhasil disalin ke clipboard!");
+      });
+    }
+
+    // Toggle Mobile Sidebar
+    function toggleSidebar() {
+      const sb = document.getElementById('sidebar');
+      sb.classList.toggle('open');
+    }
+
+    // Active Navigation Highlight on Scroll
+    window.addEventListener('scroll', () => {
+      const sections = document.querySelectorAll('section');
+      const navLinks = document.querySelectorAll('.sidebar-menu a');
+      let currentSection = '';
+
+      sections.forEach(section => {
+        const sectionTop = section.offsetTop - 120;
+        if (pageYOffset >= sectionTop) {
+          currentSection = section.getAttribute('id');
+        }
+      });
+
+      navLinks.forEach(link => {
+        link.classList.remove('active');
+        if (link.getAttribute('href') === '#' + currentSection) {
+          link.classList.add('active');
+          document.getElementById('crumb-active').innerText = link.innerText.trim();
+        }
+      });
+    });
+
+    // Syntax Highlighting
+    hljs.highlightAll();
+  </script>
+</body>
+</html>
+
