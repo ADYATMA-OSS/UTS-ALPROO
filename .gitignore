@@ -1,0 +1,15 @@
+# macOS
+.DS_Store
+
+# IDE & Editor Settings
+.vscode/
+
+# Compiled Binaries and Debug Symbols
+src/modul_a
+src/modul_b
+src/main_program
+*.o
+*.out
+*.dSYM/
+*.dSYM
+
