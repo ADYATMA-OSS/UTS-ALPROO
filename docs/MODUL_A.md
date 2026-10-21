@@ -285,3 +285,69 @@ ALGORITMA
     OUTPUT "Program Selesai. Total transaksi: ", counterTransaksi
 END PROGRAM
 ```
+
+---
+
+## 6. Flowchart Logika Modul A
+
+```mermaid
+flowchart TD
+    Start(["Mulai"]) --> Init["Inisialisasi Konstanta & Variabel<br>counterTransaksi = 0"]
+    Init --> LoopStart["counterTransaksi = counterTransaksi + 1"]
+    
+    LoopStart --> InNama[/"Input namaPelanggan"/]
+    InNama --> InBerat[/"Input beratCucian"/]
+    
+    InBerat --> ValBerat{"beratCucian > 0?"}
+    ValBerat -- "Tidak" --> ErrBerat[/"Tampilkan Pesan Error"/] --> InBerat
+    ValBerat -- "Ya" --> InLayanan[/"Input jenisLayanan (1/2)"/]
+    
+    InLayanan --> ValLayanan{"jenisLayanan == 1<br>atau jenisLayanan == 2?"}
+    ValLayanan -- "Tidak" --> ErrLayanan[/"Tampilkan Pesan Error"/] --> InLayanan
+    ValLayanan -- "Ya" --> InMember[/"Input statusMember (Y/T)"/]
+    
+    InMember --> ValMember{"statusMember == 'Y'<br>atau 'T'?"}
+    ValMember -- "Tidak" --> ErrMember[/"Tampilkan Pesan Error"/] --> InMember
+    ValMember -- "Ya" --> InAntar[/"Input layananAntar (Y/T)"/]
+    
+    InAntar --> ValAntar{"layananAntar == 'Y'<br>atau 'T'?"}
+    ValAntar -- "Tidak" --> ErrAntar[/"Tampilkan Pesan Error"/] --> InAntar
+    ValAntar -- "Ya" --> CalcRound["beratBulat = CEIL(beratCucian)"]
+    
+    CalcRound --> CheckMin{"beratBulat < 2.0?"}
+    CheckMin -- "Ya" --> SetMin["beratHitung = 2.0"]
+    CheckMin -- "Tidak" --> SetRound["beratHitung = beratBulat"]
+    
+    SetMin --> CheckLayanan{"jenisLayanan == 1?"}
+    SetRound --> CheckLayanan
+    
+    CheckLayanan -- "Ya" --> SetReguler["tarifPerKg = 7000<br>namaLayanan = 'Reguler'"]
+    CheckLayanan -- "Tidak" --> SetExpress["tarifPerKg = 11000<br>namaLayanan = 'Express'"]
+    
+    SetReguler --> Subtotal["subtotalCuci = beratHitung * tarifPerKg"]
+    SetExpress --> Subtotal
+    
+    Subtotal --> CheckDisc1{"statusMember == 'Y'<br>DAN beratHitung >= 5.0?"}
+    CheckDisc1 -- "Ya" --> DiscMember["persenDiskon = 5%<br>nilaiDiskon = subtotalCuci * 0.05"]
+    CheckDisc1 -- "Tidak" --> CheckDisc2{"statusMember == 'T'<br>DAN beratHitung >= 10.0?"}
+    
+    CheckDisc2 -- "Ya" --> DiscNon["persenDiskon = 3%<br>nilaiDiskon = subtotalCuci * 0.03"]
+    CheckDisc2 -- "Tidak" --> DiscZero["persenDiskon = 0%<br>nilaiDiskon = 0"]
+    
+    DiscMember --> CheckAntar{"layananAntar == 'Y'?"}
+    DiscNon --> CheckAntar
+    DiscZero --> CheckAntar
+    
+    CheckAntar -- "Ya" --> SetAntar["biayaAntar = 8000"]
+    CheckAntar -- "Tidak" --> ZeroAntar["biayaAntar = 0"]
+    
+    SetAntar --> CalcTotal["totalTagihan = (subtotalCuci - nilaiDiskon) + biayaAntar"]
+    ZeroAntar --> CalcTotal
+    
+    CalcTotal --> PrintReceipt[/"Tampilkan Rincian Tagihan"/]
+    PrintReceipt --> InUlang[/"Input ulang (Y/T)"/]
+    
+    InUlang --> ValUlang{"ulang == 'Y'?"}
+    ValUlang -- "Ya" --> LoopStart
+    ValUlang -- "Tidak" --> Finish(["Selesai (Cetak Ringkasan Transaksi)"])
+```
